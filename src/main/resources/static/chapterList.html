@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript">
+        var url = location.search;
+        var tag = url.indexOf("?")
+        var bookid
+        if (tag != -1) {
+            var paramStr = url.substr(tag, url.length)
+            var params = paramStr.split("&");
+            var bookidTag = params[0]
+            var bookids = bookidTag.split("=");
+            bookid = bookids[1]
+        }
+
+        loadDeitl()
+        loadChapter(1)
+
+        function loadDeitl() {
+
+        }
+
+        function loadChapter(page) {
+
+            var xhr = new XMLHttpRequest();
+            var url = "/book/chapterlist" + "?bookid=" + bookid + "&page=" + page + "&pageSize=20"
+            xhr.open("get", url)
+            xhr.send(null)
+            xhr.onreadystatechange = function () {
+                if (xhr.status = 200 && xhr.readyState == 4) {
+                    var response = JSON.parse(xhr.responseText)
+                    if (response.result == 1) {
+                        var data = response.data;
+                        var list = data.list;
+                        var table = document.createElement("table")
+                        var count = 1 + 20 * (page - 1);
+                        for (var i in list) {
+                            var item = list[i]
+                            var tr = document.createElement("tr")
+                            var num = document.createElement("td")
+                            num.setAttribute("class",'top-li')
+                            num.innerText = count;
+                            tr.appendChild(num)
+                            var chapterName = document.createElement("td")
+                            chapterName.setAttribute("class",'top-li')
+                            chapterName.innerText = item.chapterName;
+                            tr.appendChild(chapterName)
+                            tr.setAttribute('chapter-id',item.chapterId)
+                            tr.onclick = function (ev) {
+                                var chapterid = this.getAttribute("chapter-id");
+                                window.location = "detil.html?bookid="+bookid+"&chapterId="+chapterid
+                            }
+                            count = count + 1
+                            table.appendChild(tr)
+                        }
+                        var mainContainer = document.getElementById('main');
+                        mainContainer.innerHTML = ""
+                        mainContainer.appendChild(table)
+
+                        var footerUl = document.createElement("ul")
+                        var pageCount = data.totalPage
+                        if(pageCount > 1){
+                            for (var i = 1; i <=pageCount; i++) {
+                                var li = document.createElement("li")
+                                li.innerText = i+"页"
+                                li.setAttribute('class','top-li')
+                                li.setAttribute("data-id",i)
+                                li.onclick = function (ev) {
+                                    var num = this.getAttribute("data-id")
+                                    loadChapter(num)
+                                }
+                                footerUl.appendChild(li)
+                            }
+                        }
+                        var footer = document.getElementById("footer");
+                        footer.innerHTML = ""
+                        footer.appendChild(footerUl)
+
+                    }
+                }
+            }
+        }
+
+    </script>
+    <style>
+        .top-li {
+            list-style: none;
+            float: left;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="top"></div>
+<br/>
+<div id="main"></div>
+<br/>
+<div id="footer"></div>
+</body>
+</html>

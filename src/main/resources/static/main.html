@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BookList</title>
+
+    <style>
+        .top-li {
+            list-style: none;
+            float: left;
+            padding-left: 20px;
+        }
+        #main{
+            margin:auto;
+        }
+        .footer-list{
+            float: left;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="top">
+    <li class="top-li" onclick="clickCate(100001,1)">
+        <a>玄幻小说</a>
+
+    </li>
+    <li class="top-li" onclick="clickCate(100002,1)">
+        <a>修真小说</a>
+    </li>
+    <li class="top-li" onclick="clickCate(100003,1)">
+        <a>都市小说</a>
+    </li>
+    <li class="top-li" onclick="clickCate(100004,1)">
+        <a>穿越小说</a>
+    </li>
+    <li class="top-li" onclick="clickCate(100006,1)">
+        <a>网游小说</a>
+    </li>
+    <li class="top-li" onclick="clickCate(100007,1)">
+        <a>科幻小说</a>
+    </li>
+    <li class="top-li" onclick="clickCate(100008,1)">
+        <a>女生小说</a>
+    </li>
+</div>
+<br/>
+<div id="main" >
+
+</div>
+<br/>
+<div id ="footer">
+
+</div>
+</body>
+<script type="text/javascript">
+    clickCate(100001,1)
+    function clickCate(number,page) {
+        var mainContainer = document.getElementById("main")
+        mainContainer.innerHTML = ""
+        var xhr = new XMLHttpRequest();
+        var url = "/book/booklistInCate"+"?cateid="+number+"&page="+page+"&pageSize=20"
+        xhr.open("get",url)
+        xhr.send(null)
+        xhr.onreadystatechange = function(){
+            if(xhr.status = 200&& xhr.readyState == 4){
+                var response = JSON.parse(xhr.responseText)
+                if(response.result == 1){
+                    var data = response.data;
+                    var list = data.list;
+                    var table = document.createElement("table")
+                    var count = 1 + 20*(page - 1);
+                    for(var i in list){
+                        var item = list[i]
+                        var tr = document.createElement("tr")
+                        var num = document.createElement("td")
+                        num.setAttribute("class",'top-li')
+                        num.innerText = count
+                        tr.appendChild(num)
+                        var bookName = document.createElement("td")
+                        bookName.setAttribute('class','top-li')
+                        bookName.innerText = item.bookName
+                        tr.appendChild(bookName)
+                        var author = document.createElement("td")
+                        author.setAttribute('class','top-li')
+                        author.innerText = item.bookAuthor
+                        tr.appendChild(author)
+                        tr.setAttribute("book-id",item.bookid)
+                        tr.onclick = function (ev) {
+                            var bookid = this.getAttribute("book-id");
+                            window.location = "chapterList.html?bookid="+bookid
+                        }
+                        table.appendChild(tr)
+                        count = count + 1
+                    }
+                    mainContainer.appendChild(table)
+
+                    var footerUl = document.createElement("ul")
+                    var pageCount = data.totalPage
+                    if(pageCount > 1){
+                        for (var i = 1; i <=pageCount; i++) {
+                            var li = document.createElement("li")
+                            li.innerText = i+"页"
+                            li.setAttribute('class','top-li')
+                            li.setAttribute("data-id",i)
+                            li.onclick = function (ev) {
+                                var num = this.getAttribute("data-id")
+                                clickCate(number,num)
+                            }
+                            footerUl.appendChild(li)
+                        }
+                    }
+                    var footer = document.getElementById("footer");
+                    footer.innerHTML = ""
+                    footer.appendChild(footerUl)
+                }
+            }
+        }
+    }
+
+
+
+</script>
+</html>

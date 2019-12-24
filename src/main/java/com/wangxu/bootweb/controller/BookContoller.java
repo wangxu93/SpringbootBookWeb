@@ -18,7 +18,7 @@ public class BookContoller {
     @Autowired
     private RESTService restService;
 
-    @RequestMapping(value = "/main")
+    @RequestMapping(value = "/mmain")
     public String main(Model model){
         List<BookCateInfo> allCateList = restService.findAllCateList();
         model.addAttribute("cateList",allCateList);
